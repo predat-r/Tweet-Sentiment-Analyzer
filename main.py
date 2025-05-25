@@ -11,7 +11,7 @@ This script implements a complete Twitter sentiment analysis pipeline using:
 - Model evaluation with visualizations
 
 Dataset: Sentiment140 dataset with 1.6 million tweets
-Download from: https://www.kaggle.com/kazanova/sentiment140
+Sourced from: https://www.kaggle.com/kazanova/sentiment140
 """
 
 # Import required libraries
@@ -876,9 +876,16 @@ def main():
     MODEL_DIR = 'model'
 
     # === Configuration ===
+    # Download datasets from Kaggle
     dataset_dir = kagglehub.dataset_download("kazanova/sentiment140")
     DATA_PATH = os.path.join(dataset_dir, "training.1600000.processed.noemoticon.csv")
-    GLOVE_PATH = "glove.6B.100d.txt"
+
+    # Download and set up GloVe embeddings
+    glove_dir = kagglehub.dataset_download("anmolkumar/glove-embeddings")
+    GLOVE_PATH = os.path.join(glove_dir, "glove.6B.100d.txt")
+
+    print(f"Using Sentiment140 dataset: {DATA_PATH}")
+    print(f"Using GloVe embeddings: {GLOVE_PATH}")
 
     # Load dataset and prepare sequences
     dataset = analyzer.load_data(DATA_PATH, sample_size=100000)
