@@ -74,129 +74,52 @@ class TwitterSentimentAnalyzer:
         # Column names for Sentiment140 dataset
         columns = ['target', 'id', 'date', 'flag', 'user', 'text']
         
-        try:
-            # Load the complete dataset first
-            print("Reading dataset...")
-            dataset = pd.read_csv(file_path, 
-                                encoding="latin-1", 
-                                header=None, 
-                                names=columns)
-            
-            # Convert target labels (4 → 1)
-            dataset['target'] = dataset['target'].replace({4: 1})
-            
-            # Keep only target and text columns
-            dataset = dataset[['target', 'text']].copy()
-            
-            # Sample with stratification if sample_size is specified
-            if sample_size and sample_size < len(dataset):
-                # Calculate samples per class to maintain balance
-                samples_per_class = sample_size // 2
-                
-                # Sample equally from each class
-                neg_samples = dataset[dataset['target'] == 0].sample(
-                    n=samples_per_class, random_state=42)
-                pos_samples = dataset[dataset['target'] == 1].sample(
-                    n=samples_per_class, random_state=42)
-                
-                # Combine and shuffle
-                dataset = pd.concat([neg_samples, pos_samples])
-                dataset = dataset.sample(frac=1, random_state=42).reset_index(drop=True)
-                
-                print(f"Sampled {sample_size} entries ({samples_per_class} per class)")
-            else:
-                print(f"Using full dataset with {len(dataset)} entries")
-            
-            # Remove any missing values
-            dataset = dataset.dropna()
-            
-            # Rename text column to content for consistency
-            dataset = dataset.rename(columns={'text': 'content'})
-            
-            # Display class distribution
-            class_dist = dataset['target'].value_counts()
-            print("\nClass distribution:")
-            print(f"Negative (0): {class_dist[0]} samples ({class_dist[0]/len(dataset)*100:.1f}%)")
-            print(f"Positive (1): {class_dist[1]} samples ({class_dist[1]/len(dataset)*100:.1f}%)")
-            
-            return dataset
-            
-        except FileNotFoundError:
-            print(f"Dataset file not found at {file_path}")
-            print("\nTo use this script with real data:")
-            print("1. Download the Sentiment140 dataset from Kaggle:")
-            print("   https://www.kaggle.com/kazanova/sentiment140")
-            print("2. Extract the 'training.1600000.processed.noemoticon.csv' file")
-            print("3. Update the file path in the main() function")
-            print("\nFor now, creating a sample dataset for demonstration...")
-            
-            return self._create_sample_data()
+        # Load the complete dataset
+        print("Reading dataset...")
+        dataset = pd.read_csv(file_path, 
+                         encoding="latin-1", 
+                         header=None, 
+                         names=columns)
     
-    def _create_sample_data(self) -> pd.DataFrame:
-        """Create sample data for demonstration purposes"""
-        print("Creating sample dataset for demonstration...")
-        
-        positive_tweets = [
-            "I absolutely love this amazing weather today! Perfect for outdoor activities.",
-            "Just had the most incredible dining experience at this new restaurant!",
-            "Feeling so grateful for all the wonderful people in my life right now.",
-            "Best vacation ever! The scenery here is breathtaking and unforgettable.",
-            "Successfully completed my project today. Team collaboration was fantastic!",
-            "This movie was absolutely brilliant! Outstanding performances by all actors.",
-            "Love spending quality time with family during weekends. So peaceful.",
-            "Got promoted at work today! Hard work finally paying off beautifully.",
-            "Perfect weather for a relaxing picnic in the beautiful park.",
-            "Amazing concert last night! The band's performance was truly spectacular.",
-            "Thrilled about starting my new job next week. Exciting opportunities ahead!",
-            "Wonderful news from the doctor today. Clean bill of health!",
-            "Best birthday celebration ever! Friends made it incredibly special and memorable.",
-            "Successfully finished my marathon today! Personal best time achieved.",
-            "Love my new apartment! Finally feels like a perfect home.",
-            "Incredible sunset tonight! Nature's beauty never fails to amaze me.",
-            "Great workout session this morning! Feeling energized and motivated.",
-            "Delicious homemade dinner tonight! Cooking brings me so much joy.",
-            "Fantastic book recommendation from friend! Couldn't put it down.",
-            "Beautiful flowers blooming in garden! Spring is absolutely wonderful."
-        ] * 10  # Multiply to get more samples
-        
-        negative_tweets = [
-            "This has been the absolute worst day of my entire life.",
-            "Completely disappointed with the terrible service at this restaurant today.",
-            "Traffic was absolutely horrible this morning. Late for important meeting.",
-            "This movie was a complete waste of time and money. Boring.",
-            "Feeling extremely frustrated with constant technical problems at work.",
-            "Weather ruined our carefully planned outdoor wedding celebration completely.",
-            "Lost my wallet today with all important cards and cash inside.",
-            "Computer crashed again and lost hours of important work progress.",
-            "Missed my flight due to unexpected delays. Vacation plans ruined.",
-            "Terrible customer service experience. Staff was incredibly rude and unhelpful.",
-            "Failed my driving test for the third time today. So discouraged.",
-            "Broke my phone screen this morning. Expensive repair needed.",
-            "Got sick right before important presentation. Bad timing always.",
-            "Parking ticket on my car despite paying the meter properly.",
-            "Internet connection problems all day. Cannot complete any work.",
-            "Favorite restaurant permanently closed due to pandemic. Very sad.",
-            "Received disappointing news about job application rejection today.",
-            "Long lines everywhere today. Wasted entire afternoon waiting around.",
-            "Headache all day despite taking multiple pain relief medications.",
-            "Package delivery was delayed again. Third time this month."
-        ] * 10  # Multiply to get more samples
-        
-        # Combine tweets and create labels
-        all_tweets = positive_tweets + negative_tweets
-        labels = [1] * len(positive_tweets) + [0] * len(negative_tweets)
-        
-        # Create DataFrame
-        dataset = pd.DataFrame({
-            'target': labels,
-            'content': all_tweets
-        })
-        
-        # Shuffle the dataset
-        dataset = dataset.sample(frac=1).reset_index(drop=True)
-        
-        print(f"Sample dataset created with {len(dataset)} samples")
+        # Convert target labels (4 → 1)
+        dataset['target'] = dataset['target'].replace({4: 1})
+    
+        # Keep only target and text columns
+        dataset = dataset[['target', 'text']].copy()
+    
+        # Sample with stratification if sample_size is specified
+        if sample_size and sample_size < len(dataset):
+            # Calculate samples per class to maintain balance
+            samples_per_class = sample_size // 2
+            
+            # Sample equally from each class
+            neg_samples = dataset[dataset['target'] == 0].sample(
+                n=samples_per_class, random_state=42)
+            pos_samples = dataset[dataset['target'] == 1].sample(
+                n=samples_per_class, random_state=42)
+            
+            # Combine and shuffle
+            dataset = pd.concat([neg_samples, pos_samples])
+            dataset = dataset.sample(frac=1, random_state=42).reset_index(drop=True)
+            
+            print(f"Sampled {sample_size} entries ({samples_per_class} per class)")
+        else:
+            print(f"Using full dataset with {len(dataset)} entries")
+    
+        # Remove any missing values
+        dataset = dataset.dropna()
+    
+        # Rename text column to content for consistency
+        dataset = dataset.rename(columns={'text': 'content'})
+    
+        # Display class distribution
+        class_dist = dataset['target'].value_counts()
+        print("\nClass distribution:")
+        print(f"Negative (0): {class_dist[0]} samples ({class_dist[0]/len(dataset)*100:.1f}%)")
+        print(f"Positive (1): {class_dist[1]} samples ({class_dist[1]/len(dataset)*100:.1f}%)")
+    
         return dataset
+    
     
     def explore_data(self, dataset: pd.DataFrame) -> None:
         """
