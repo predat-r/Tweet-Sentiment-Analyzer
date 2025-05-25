@@ -14,7 +14,7 @@ This project implements a complete pipeline for analyzing the sentiment of tweet
    * [3. Preprocessing](#3-preprocessing)
    * [4. Tokenization & Sequencing](#4-tokenization--sequencing)
    * [5. Embeddings (GloVe)](#5-embeddings-glove)
-   * [6. Model Architecture](#6-model-architecture)
+   * [6. Model Architecture (with Bidirectional LSTMs)](#6-model-architecture-with-bidirectional-lstms)
    * [7. Training](#7-training)
    * [8. Evaluation](#8-evaluation)
    * [9. Predictions](#9-predictions)
@@ -110,9 +110,11 @@ If a word isn't found, it's initialized with a random vector.
 
 ---
 
-### 6. Model Architecture
+### 6. Model Architecture (with Bidirectional LSTMs)
 
 The core of the model uses **Bidirectional LSTMs**:
+
+> A Bidirectional LSTM processes the text **forward and backward** through the sequence. This means it understands not just the preceding words, but also the ones that follow — making it much better at understanding context in natural language.
 
 ```python
 model = Sequential([
@@ -127,7 +129,9 @@ model = Sequential([
 ])
 ```
 
-The model is compiled with:
+We compile the model using the **Adam optimizer**:
+
+> Adam (Adaptive Moment Estimation) is a popular optimization algorithm that combines the benefits of two other extensions of stochastic gradient descent — **AdaGrad** and **RMSProp**. It's well-suited for training deep neural networks efficiently and adaptively.
 
 ```python
 model.compile(optimizer=Adam(0.001), loss='binary_crossentropy', metrics=['accuracy'])
@@ -151,7 +155,7 @@ Trained models and tokenizers are saved to disk (`model/` directory).
 
 We generate:
 
-* Confusion Matrix
+* Confusion Matrix (shows correct vs. incorrect predictions)
 * Precision/Recall/F1
 * Prediction Score Histograms
 
