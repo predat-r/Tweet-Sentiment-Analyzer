@@ -123,7 +123,7 @@ class TwitterSentimentAnalyzer:
     
     def explore_data(self, dataset: pd.DataFrame) -> None:
         """
-        Explore and visualize the dataset
+        Explore and display dataset statistics
         
         Args:
             dataset (pd.DataFrame): The dataset to explore
@@ -132,77 +132,13 @@ class TwitterSentimentAnalyzer:
         print(f"Dataset shape: {dataset.shape}")
         print(f"Missing values:\n{dataset.isna().sum()}")
         
-        # Display sample tweets
-        print("\nSample tweets:")
-        print(dataset.head(10))
+        # Calculate required statistics silently
+        text_lengths = dataset['content'].str.len()
+        word_counts = dataset['content'].str.split().str.len()
         
-        # Target distribution
-        target_counts = dataset['target'].value_counts()
-        print(f"\nTarget distribution:")
-        print(f"Negative (0): {target_counts[0]} samples ({target_counts[0]/len(dataset)*100:.1f}%)")
-        print(f"Positive (1): {target_counts[1]} samples ({target_counts[1]/len(dataset)*100:.1f}%)")
-        
-        # Text length statistics
-        dataset['text_length'] = dataset['content'].str.len()
-        dataset['word_count'] = dataset['content'].str.split().str.len()
-        
-        print(f"\nText statistics:")
-        print(f"Average text length: {dataset['text_length'].mean():.1f} characters")
-        print(f"Average word count: {dataset['word_count'].mean():.1f} words")
-        print(f"Max text length: {dataset['text_length'].max()} characters")
-        print(f"Max word count: {dataset['word_count'].max()} words")
-        
-        # Visualizations
-        plt.figure(figsize=(15, 10))
-        
-        # Target distribution pie chart
-        plt.subplot(2, 3, 1)
-        labels = ['Negative', 'Positive']
-        colors = ['#ff6b6b', '#51cf66']
-        plt.pie(np.array(target_counts.values), labels=labels, colors=colors, autopct='%.1f%%')
-        plt.title('Sentiment Distribution')
-        
-        # Target distribution bar chart
-        plt.subplot(2, 3, 2)
-        target_counts.plot(kind='bar', color=colors)
-        plt.title('Sentiment Counts')
-        plt.xlabel('Sentiment')
-        plt.ylabel('Count')
-        plt.xticks([0, 1], ['Negative', 'Positive'], rotation=0)
-        
-        # Text length distribution
-        plt.subplot(2, 3, 3)
-        plt.hist(dataset['text_length'], bins=50, alpha=0.7, color='skyblue')
-        plt.title('Text Length Distribution')
-        plt.xlabel('Text Length (characters)')
-        plt.ylabel('Frequency')
-        
-        # Word count distribution
-        plt.subplot(2, 3, 4)
-        plt.hist(dataset['word_count'], bins=50, alpha=0.7, color='lightcoral')
-        plt.title('Word Count Distribution')
-        plt.xlabel('Word Count')
-        plt.ylabel('Frequency')
-        
-        # Text length by sentiment
-        plt.subplot(2, 3, 5)
-        dataset.boxplot(column='text_length', by='target', ax=plt.gca())
-        plt.title('Text Length by Sentiment')
-        plt.suptitle('')  # Remove automatic title
-        plt.xlabel('Sentiment (0=Negative, 1=Positive)')
-        plt.ylabel('Text Length')
-        
-        # Word count by sentiment
-        plt.subplot(2, 3, 6)
-        dataset.boxplot(column='word_count', by='target', ax=plt.gca())
-        plt.title('Word Count by Sentiment')
-        plt.suptitle('')  # Remove automatic title
-        plt.xlabel('Sentiment (0=Negative, 1=Positive)')
-        plt.ylabel('Word Count')
-        
-        plt.tight_layout()
-        plt.savefig('data_exploration.png', dpi=300, bbox_inches='tight')
-        plt.show()
+        # Add length stats to dataset for processing
+        dataset['text_length'] = text_lengths
+        dataset['word_count'] = word_counts
         
         # Drop temporary columns
         dataset.drop(['text_length', 'word_count'], axis=1, inplace=True)
