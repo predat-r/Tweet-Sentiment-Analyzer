@@ -776,6 +776,36 @@ def main():
         print(f"Text: {result['text']}")
         print(f"Sentiment: {result['sentiment']} (Confidence: {result['confidence']})\n")
 
+    # Interactive sentiment analysis
+    print("\n=== Tweet Sentiment Analyzer ===")
+    print("Enter tweets to analyze (type 'quit' to exit)")
+    
+    while True:
+        # Get user input
+        tweet = input("\nEnter tweet text: ").strip()
+        
+        # Check for exit condition
+        if tweet.lower() == 'quit':
+            print("Exiting analyzer...")
+            break
+            
+        # Skip empty inputs    
+        if not tweet:
+            print("Please enter some text to analyze")
+            continue
+            
+        # Analyze sentiment
+        predictions = analyzer.predict_sentiment([tweet])
+        result = predictions[0]
+        
+        # Display formatted result
+        print("\nAnalysis Result:")
+        print("-" * 50)
+        print(f"Tweet: {result['text']}")
+        print(f"Sentiment: {result['sentiment']}")
+        print(f"Confidence: {result['confidence']*100:.1f}%")
+        print("-" * 50)
+
 
 if __name__ == "__main__":
     main()
